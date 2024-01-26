@@ -39,7 +39,11 @@ body::before {
   
   }
 }
-
+@media (max-width: 700px) {
+  body::before {
+  background-size: contain;
+  }
+}
 
 a {
   color: #18d26e;
