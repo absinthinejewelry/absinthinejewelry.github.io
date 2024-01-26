@@ -38,7 +38,7 @@ body::before {
 @media (max-width: 640px) {
   body::before {
    background: #040404 url("../img/bgm2.jpg") no-repeat;
-   
+    background-size: contain;
   }
 }
 a {
