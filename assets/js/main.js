@@ -190,66 +190,131 @@
    * Porfolio isotope and filter
    */
   window.addEventListener('load', () => {
-    let portfolioContainer = select('.portfolio-container');
-    if (portfolioContainer) {
-      let portfolioIsotope = new Isotope(portfolioContainer, {
-        itemSelector: '.portfolio-item',
-        layoutMode: 'fitRows'
-      });
+	  
+    var portfolioContainer = select('.portfolio-container');
+// HACK quantumalchemy portfolio_items:
+	
+    portfolioItems('port_items.txt');
+	async function portfolioItems(file) {
+	  let myObject = await fetch(file);
+	  let portfolio_its = await myObject.text();
+	  
+	  var pi = portfolio_its.split("\n");
+	  var pil = pi.length;
+	  console.log("PIL:", pil);
+	  
+	  var portfolio_items ="";
+	  var portfolio_item ="";
+	  var cnt = 0;
+		pi.every(function(i) {
+			
+			portfolio_item ="";
+			if(i === ""){
+				return false;
+			}
+				var pia = i.split("_");
+				var pi_title = pia[1].replaceAll("-"," ").replace(".jpg","");
+				var portfolio_item_temp = portfolioItemsTemp(pia[0],pi_title,i);
+				var portfolio_item = portfolio_item_temp ;
+				//console.log(portfolio_item);
+				portfolio_items += portfolio_item + "\n";
+				cnt++;
+				return true;
+		  
+		});
+		console.log(portfolio_items);
+		
+		portfolioContainer.innerHTML = portfolio_items;
+		
+	  	frontLoader();
+	  	
+	}
+///
+	function frontLoader(){
+		
+	
+		
+		let portfolioIsotope = new Isotope(portfolioContainer, {
+		itemSelector: '.portfolio-item',
+		layoutMode: 'fitRows'
+		});
 
-      let portfolioFilters = select('#portfolio-flters li', true);
+		let portfolioFilters = select('#portfolio-flters li', true);
+		
 
-      on('click', '#portfolio-flters li', function(e) {
-        e.preventDefault();
-        portfolioFilters.forEach(function(el) {
-          el.classList.remove('filter-active');
-        });
-        this.classList.add('filter-active');
 
-        portfolioIsotope.arrange({
-          filter: this.getAttribute('data-filter')
-        });
-      }, true);
-    }
+		/**
+		* Initiate portfolio lightbox 
+		*/
+		const portfolioLightbox = GLightbox({
+		selector: '.portfolio-lightbox'
+		});
+
+		/**
+		* Initiate portfolio details lightbox 
+		*/
+		const portfolioDetailsLightbox = GLightbox({
+		selector: '.portfolio-details-lightbox',
+		width: '90%',
+		height: '90vh'
+		});
+
+		/**
+		* Portfolio details slider
+		*/
+		new Swiper('.portfolio-details-slider', {
+		speed: 400,
+		loop: true,
+		autoplay: {
+		  delay: 5000,
+		  disableOnInteraction: false
+		},
+		pagination: {
+		  el: '.swiper-pagination',
+		  type: 'bullets',
+		  clickable: true
+		}
+		});
+        //portfolioContainer.style.height =  pch;
+		/**
+		* Initiate Pure Counter 
+		*/
+		new PureCounter();
+
+		on('click', '#portfolio-flters li', function(e) {
+		e.preventDefault();
+		portfolioFilters.forEach(function(el) {
+		  el.classList.remove('filter-active');
+		});
+		this.classList.add('filter-active');
+
+		portfolioIsotope.arrange({
+		  filter: this.getAttribute('data-filter')
+		});
+		}, true);
+		
+	}
+///
 
   });
 
-  /**
-   * Initiate portfolio lightbox 
-   */
-  const portfolioLightbox = GLightbox({
-    selector: '.portfolio-lightbox'
-  });
 
-  /**
-   * Initiate portfolio details lightbox 
-   */
-  const portfolioDetailsLightbox = GLightbox({
-    selector: '.portfolio-details-lightbox',
-    width: '90%',
-    height: '90vh'
-  });
+function portfolioItemsTemp(portfolio_cat,portfolio_title,portfolio_img){
+var temp = `<div class="col-lg-4 col-md-6 portfolio-item filter-${portfolio_cat}">
+  <div class="portfolio-wrap">
+	<img src="assets/img/portfolio/${portfolio_img}" class="img-fluid" alt=""></img>
+	<div class="portfolio-info">
+	  <h4>${portfolio_title}</h4>
+	  <p>${portfolio_cat}</p>
+	  <div class="portfolio-links">
+		<a href="assets/img/portfolio/${portfolio_img}" data-gallery="portfolioGallery" class="portfolio-lightbox" title="${portfolio_title}"><i class="bx bx-plus"></i></a>
+	  </div>
+	</div>
+  </div> 
+</div>`;
+return temp;
+}
 
-  /**
-   * Portfolio details slider
-   */
-  new Swiper('.portfolio-details-slider', {
-    speed: 400,
-    loop: true,
-    autoplay: {
-      delay: 5000,
-      disableOnInteraction: false
-    },
-    pagination: {
-      el: '.swiper-pagination',
-      type: 'bullets',
-      clickable: true
-    }
-  });
 
-  /**
-   * Initiate Pure Counter 
-   */
-  new PureCounter();
 
 })()
